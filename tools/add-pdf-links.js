@@ -30,8 +30,8 @@ replaceInFiles(__dirname + "/../index.html", function(code, path) {
     return code.replace(/class="book-card">[\s\S]*?<\/div>/g, function(match) {
         match = match.replace(/ *<a href="(.*?)"[^>]*>(PDF|EPUB)<\/a>\n?/g, "")
         console.log("Removing old links from " + match);
-        return match.replace(/( *)<a href="(.*?).html" class="btn">Կարդալ<\/a>\n/g, function(all, indent, href) {
-            return all.trimEnd() + "\n" +
+        return match.replace(/( *)<a href="(.*?).html"[^>]*>(Կարդալ|HTML)<\/a>\n/g, function(all, indent, href) {
+            return `${indent}<a href="${href}.html">HTML</a>\n` +
                 `${indent}<a href="${href}.pdf">PDF</a>\n` +
                 `${indent}<a href="${href}.epub">EPUB</a>\n`;
         });
