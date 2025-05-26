@@ -1,0 +1,17 @@
+{
+  "name": "word-to-ebook-converter",
+  "version": "1.0.0",
+  "description": "Convert Word documents to HTML and EPUB formats",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "process-books": "node tools/run-converter.js"
+  },
+  "dependencies": {
+    "mammoth": "^1.6.0",
+    "epub-gen": "^0.1.0",
+    "cheerio": "^1.0.0-rc.12",
+    "fs-extra": "^11.2.0",
+    "sanitize-html": "^2.12.1"
+  }
+}
