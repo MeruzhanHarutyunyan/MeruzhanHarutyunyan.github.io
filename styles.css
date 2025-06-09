@@ -96,6 +96,12 @@ section > h2 {
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
+
+    max-width: 25em;
+    min-height: 12em;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .book-card:hover {
@@ -177,6 +183,13 @@ section > h2 {
     color: #666;
 }
 
+
+.spacer {
+    flex: 1;
+}
+.download-links {
+    padding: 1em;
+}
 /* About section */
 .about-content {
     display: grid;
