@@ -2,10 +2,23 @@ var {DOMParser, XMLSerializer} = require('xmldom');
 var xpath  = require("xpath");
 var JsZip = require("jszip");
 var fs = require("fs");
+var Path = require("path");
 
-var docxInputPath = "LEOPARD.docx"; 
+console.log(process.argv)   
+var docxInputPath = Path.join(process.cwd(), process.argv[2]); 
 var strOutputPath = "output.txt";
- 
+
+var fontNameMap = {
+    "Courier LatArm": 1,
+    'Times Armenian': 1,
+    'Times LatArm': 1,
+
+    'Russian Times': 2,
+    'Times LatRus': 2,
+    "Baltica": 2,
+    'Courier LatRus': 2,
+}
+
 function replaceText(node) {
     if (!node.childNodes) return;
     for (var i = 0; i < node.childNodes.length; i++) {
@@ -14,7 +27,22 @@ function replaceText(node) {
 
             var serializer = new XMLSerializer();        
             var docx_str_new = serializer.serializeToString(node);
-            child.textContent = changeEncoding(child.textContent);
+            var fonts = Array.from(docx_str_new.matchAll(/w:ascii="([^"]+)"/g)).map(x=>x[1])
+            if (!fonts.length) {
+                if (/[\xa0-\xff]/.test(docx_str_new))
+                    console.log(docx_str_new)
+            } else if (fonts.length == 1) {
+                var fontVal = fontNameMap[fonts[0]]
+                if (fontVal) {
+                    child.textContent = changeEncoding(child.textContent, fontVal == 1 ? armMap : rusMap, docx_str_new);
+                } else {
+                    if (/[\xa0-\xff]/.test(docx_str_new))
+                        console.log(fonts[0], docx_str_new)
+                }
+            } else {
+                console.log(fonts)
+            }
+            // child.textContent = changeEncoding(child.textContent);
             // if (/"Times Armenian"/.test(docx_str_new)) {
             //     child.textContent = changeEncoding(child.textContent);
             // }
@@ -186,6 +214,77 @@ var armMap = {
     255: 8216,// ‘
 }
 
+var rusMap = {
+    168: 1025,// Ё
+    184: 1105,// ё
+    185: 8470,// №
+    190: 8230,// …
+    192: 1040,// А
+    193: 1041,// Б
+    194: 1042,// В
+    195: 1043,// Г
+    196: 1044,// Д
+    197: 1045,// Е
+    198: 1046,// Ж
+    199: 1047,// З
+    200: 1048,// И
+    201: 1049,// Й
+    202: 1050,// К
+    203: 1051,// Л
+    204: 1052,// М
+    205: 1053,// Н
+    206: 1054,// О
+    207: 1055,// П
+    208: 1056,// Р
+    209: 1057,// С
+    210: 1058,// Т
+    211: 1059,// У
+    212: 1060,// Ф
+    213: 1061,// Х
+    214: 1062,// Ц
+    215: 1063,// Ч
+    216: 1064,// Ш
+    217: 1065,// Щ
+    218: 1066,// Ъ
+    219: 1067,// Ы
+    220: 1068,// Ь
+    221: 1069,// Э
+    222: 1070,// Ю
+    223: 1071,// Я
+    224: 1072,// а
+    225: 1073,// б
+    226: 1074,// в
+    227: 1075,// г
+    228: 1076,// д
+    229: 1077,// е
+    230: 1078,// ж
+    231: 1079,// з
+    232: 1080,// и
+    233: 1081,// й
+    234: 1082,// к
+    235: 1083,// л
+    236: 1084,// м
+    237: 1085,// н
+    238: 1086,// о
+    239: 1087,// п
+    240: 1088,// р
+    241: 1089,// с
+    242: 1090,// т
+    243: 1091,// у
+    244: 1092,// ф
+    245: 1093,// х
+    246: 1094,// ц
+    247: 1095,// ч
+    248: 1096,// ш
+    249: 1097,// щ
+    250: 1098,// ъ
+    251: 1099,// ы
+    252: 1100,// ь
+    253: 1101,// э
+    254: 1102,// ю
+    255: 1103,// я
+}
+
 var ignore = {
     32: " ",
     10: "\n",
@@ -216,21 +315,26 @@ var ignore = {
     8211: "–",
     8230: "…",
 }
-function changeEncoding(string) {
+function changeEncoding(string, fontMap, errString) {
     var map = {}
 
-    for (var i in armMap) {
-        map[i] = String.fromCharCode(armMap[i]);
+    for (var i in fontMap) {
+        map[i] = String.fromCharCode(fontMap[i]);
     }
     var newString = "";
+    var hasErrors = false
     for (var i = 0; i < string.length; i++) {
         var char = string[i];
         var code = char.charCodeAt(0);
         if (161< code && code < 256 && !map[code] && !ignore[code]) {
+            hasErrors = true
             console.log(char, code, map[code]);
         }
         var newChar = map[code] || char;
         newString += newChar;
+    }
+    if (hasErrors) {
+        console.log(">>>>", errString)
     }
     return newString;
 }

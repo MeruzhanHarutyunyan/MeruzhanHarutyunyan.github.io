@@ -8,10 +8,13 @@
     "process-books": "node tools/run-converter.js"
   },
   "dependencies": {
-    "mammoth": "^1.6.0",
-    "epub-gen": "^0.1.0",
     "cheerio": "^1.0.0-rc.12",
+    "epub-gen": "^0.1.0",
     "fs-extra": "^11.2.0",
-    "sanitize-html": "^2.12.1"
+    "jszip": "^3.10.1",
+    "mammoth": "^1.6.0",
+    "sanitize-html": "^2.12.1",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.34"
   }
 }
