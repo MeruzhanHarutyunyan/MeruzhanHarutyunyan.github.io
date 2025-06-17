@@ -53,8 +53,8 @@ replaceInFiles(__dirname + "/../index.html", function(code, path) {
         if (endIndex == -1) 
             throw new Error("endindex not found")
         var str = code.slice(startIndex, endIndex + endStr.length)
-        str = str.replace(/"books\/.*?"/g, x + ".html")
-        console.log(str)
+        str = str.replace(/"books\/.*?"/g, '"books/' + x + '.html"')
+        
         code = code.slice(0, startIndex) + str + "\n" + code.slice(startIndex, -1)
     })
 

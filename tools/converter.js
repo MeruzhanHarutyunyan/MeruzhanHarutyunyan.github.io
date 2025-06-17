@@ -47,7 +47,12 @@ class BookConverter {
 
         // Save the HTML file
         const htmlOutput = path.join(this.outputDir, `${this.bookTitle}.html`);
-        await fs.writeFile(htmlOutput, $.html());
+        await fs.writeFile(
+            htmlOutput,
+            $.html()
+                .replace(/<\/(p|h\d?)>/g, "$&\n")
+                .replace(/\xad/g, "")
+        );
         console.log(`HTML file created: ${htmlOutput}`);
     }
 
