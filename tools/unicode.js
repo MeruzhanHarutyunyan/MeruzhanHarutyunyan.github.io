@@ -8,6 +8,9 @@ console.log(process.argv)
 var docxInputPath = Path.join(process.cwd(), process.argv[2]); 
 var strOutputPath = "output.txt";
 
+// sometimes non-unicode font is embedded in style, and we can't detect it 
+var forceArmFonts = process.argv.indexOf("--force-armenian") != -1
+
 var fontNameMap = {
     "Courier LatArm": 1,
     'Times Armenian': 1,
@@ -28,16 +31,22 @@ function replaceText(node) {
             var serializer = new XMLSerializer();        
             var docx_str_new = serializer.serializeToString(node);
             var fonts = Array.from(docx_str_new.matchAll(/w:ascii="([^"]+)"/g)).map(x=>x[1])
+
+            if (!fonts.length && forceArmFonts) {
+                fonts = ['Times Armenian']
+                console.log(changeEncoding(child.textContent, armMap, docx_str_new.slice(0, 100)) )
+            }
+
             if (!fonts.length) {
                 if (/[\xa0-\xff]/.test(docx_str_new))
-                    console.log(docx_str_new)
+                    console.log("no fonts", docx_str_new.slice(0, 300))
             } else if (fonts.length == 1) {
                 var fontVal = fontNameMap[fonts[0]]
                 if (fontVal) {
-                    child.textContent = changeEncoding(child.textContent, fontVal == 1 ? armMap : rusMap, docx_str_new);
+                    child.textContent = changeEncoding(child.textContent, fontVal == 1 ? armMap : rusMap, docx_str_new.slice(0, 100));
                 } else {
                     if (/[\xa0-\xff]/.test(docx_str_new))
-                        console.log(fonts[0], docx_str_new)
+                        console.log(fonts[0], docx_str_new.slice(0, 100))
                 }
             } else {
                 console.log(fonts)
@@ -71,6 +80,9 @@ async function main() {
 
         var strOutputPath = docxInputPath.replace(/\.docx$/, ".unicode.docx");
         fs.writeFileSync(strOutputPath + ".xml", docx_str_new, "utf8");
+
+        // for debugging
+        fs.writeFileSync(strOutputPath + ".debug.xml", docx_str.replace(/\/[\w:]*>/g, "$&\n"), "utf8");
 
         zip.file('word/document.xml', docx_str_new);
 
