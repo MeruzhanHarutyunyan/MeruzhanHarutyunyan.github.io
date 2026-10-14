@@ -1,5 +1,4 @@
 var {DOMParser, XMLSerializer} = require('xmldom');
-var xpath  = require("xpath");
 var JsZip = require("jszip");
 var fs = require("fs");
 var Path = require("path");

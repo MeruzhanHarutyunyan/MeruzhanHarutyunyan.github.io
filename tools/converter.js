@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const fs = require('fs-extra');
 const path = require('path');
 const sanitizeHtml = require('sanitize-html');
-const Epub = require('epub-gen'); 
+// const Epub = require('epub-gen'); 
 
 class BookConverter {
     constructor(inputFile, outputDir) {

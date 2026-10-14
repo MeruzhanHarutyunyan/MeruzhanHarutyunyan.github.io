@@ -1,5 +1,4 @@
 var {DOMParser, XMLSerializer} = require('xmldom');
-var xpath  = require("xpath");
 var JsZip = require("jszip");
 var fs = require("fs");
 var Path = require("path");
@@ -67,7 +66,6 @@ function replaceText(node) {
 
 // Read the docx internal xdocument
 async function main() {
-    var wSelect = xpath.useNamespaces({"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"});
     var docxFile = fs.readFileSync(docxInputPath);
     await JsZip.loadAsync(docxFile).then(async (zip) => {
         var docx_str = await (zip.file('word/document.xml').async("string"))
@@ -78,7 +76,7 @@ async function main() {
         var serializer = new XMLSerializer();        
         var docx_str_new = serializer.serializeToString(docx);
 
-        var strOutputPath = docxInputPath.replace(/\.docx$/, ".unicode.docx");
+        var strOutputPath = docxInputPath.replace(/\.docx$/, "") + ".unicode.docx";
         fs.writeFileSync(strOutputPath + ".xml", docx_str_new, "utf8");
 
         // for debugging
